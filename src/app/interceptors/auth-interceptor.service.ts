@@ -1,3 +1,4 @@
+import { ITokensResponse } from './../../types/responses/ITokensResponse';
 import {Injectable} from '@angular/core';
 import {
   HttpRequest,
@@ -22,12 +23,10 @@ export class AuthInterceptor implements HttpInterceptor {
       request.headers.get('Authorization')?.startsWith('Bearer');
 
     if (shouldHandle) {
-      let refreshToken = this.authService.getRefreshToken();
-      const refreshTokenResponse = this.authService.refreshSession(refreshToken);
+      let tokens: ITokensResponse = JSON.parse( this.authService.getTokens() as any );
+      const refreshTokenResponse = this.authService.refreshSession(tokens.refreshToken);
       return refreshTokenResponse.pipe(switchMap((loginData) => {
-        this.authService.writeAccessToken(loginData.accessToken);
-        this.authService.writeRefreshToken(loginData.refreshToken);
-        this.authService.writeUserId(loginData.userId);
+        this.authService.setTokens(loginData);
         return next.handle(request.clone({
           setHeaders: {
             Authorization: 'Bearer ' + loginData.accessToken

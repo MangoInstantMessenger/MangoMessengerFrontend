@@ -1,3 +1,4 @@
+import { ITokensResponse } from './../../../types/responses/ITokensResponse';
 import {SessionService} from './../../services/session.service';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UsersService} from "../../services/users.service";
@@ -35,7 +36,7 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
   protected changePasswordSub$!: Subscription;
   protected updateProfilePictureSub$!: Subscription;
 
-  private userId = this.sessionService.getUserId();
+  private tokens: ITokensResponse = JSON.parse( this.sessionService.getTokens() as any );
 
   public eventsSubject: Subject<IUser> = new Subject<IUser>();
   public isLoaded = false;
@@ -70,7 +71,7 @@ export class ProfileSettingsComponent implements OnInit, OnDestroy {
   }
 
   initializeView(): void {
-    this.getCurrentUserSub$ = this.userService.getUserById(this.userId).subscribe(getUserResponse => {
+    this.getCurrentUserSub$ = this.userService.getUserById(this.tokens.userId).subscribe(getUserResponse => {
       this.currentUser = getUserResponse.user;
       this.cloneCurrentUser();
       this.emitEventToChild(this.cloneUser);

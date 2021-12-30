@@ -1,3 +1,4 @@
+import { ITokensResponse } from './../../../../types/responses/ITokensResponse';
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {SessionService} from "../../../services/session.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -24,6 +25,7 @@ export class ProfileSettingsSidebarComponent implements OnInit, OnDestroy {
   protected eventsSubscription$!: Subscription;
   protected deleteSessionSub$!: Subscription;
   protected deleteAllSessionsSub$!: Subscription;
+  protected tokens: ITokensResponse = JSON.parse( this.sessionService.getTokens() as any );
 
   public isLoaded = false;
   public user: IUser = {
@@ -58,7 +60,7 @@ export class ProfileSettingsSidebarComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    let refreshToken = this.sessionService.getRefreshToken();
+    let refreshToken = this.tokens.refreshToken;
     this.deleteSessionSub$ = this.sessionService.deleteSession(refreshToken).subscribe(_ => {
       this.clearTokens();
       this.router.navigateByUrl('login').then(r => r);
@@ -78,9 +80,7 @@ export class ProfileSettingsSidebarComponent implements OnInit, OnDestroy {
   }
 
   private clearTokens = () => {
-    this.sessionService.clearAccessToken();
-    this.sessionService.clearRefreshToken();
-    this.sessionService.clearUserId();
+    this.sessionService.clearTokens();
   }
 
   ngOnDestroy(): void {

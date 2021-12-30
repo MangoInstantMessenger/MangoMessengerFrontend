@@ -52,9 +52,7 @@ export class RegisterComponent implements OnDestroy {
     }
 
     this.registerSub$ = this.usersService.createUser(this.registerCommand).subscribe(registerResponse => {
-      this.sessionService.writeAccessToken(registerResponse.accessToken);
-      this.sessionService.writeRefreshToken(registerResponse.refreshToken);
-      this.sessionService.writeUserId(registerResponse.userId);
+      this.sessionService.setTokens(registerResponse);
       this.router.navigateByUrl('verify-email-note').then(r => r);
     }, error => {
       this.errorNotificationService.notifyOnError(error);

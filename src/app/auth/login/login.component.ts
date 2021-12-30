@@ -38,10 +38,8 @@ export class LoginComponent implements OnDestroy {
     }
 
     this.loginSub$ = this.authService.createSession(this.loginCommand).subscribe(data => {
-
-      this.authService.writeAccessToken(data.accessToken);
-      this.authService.writeRefreshToken(data.refreshToken);
-      this.authService.writeUserId(data.userId);
+      
+      this.authService.setTokens(data);
 
       this.router.navigateByUrl('main').then(r => r);
     }, error => {

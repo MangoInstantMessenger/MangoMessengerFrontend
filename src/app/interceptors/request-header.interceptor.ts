@@ -1,3 +1,4 @@
+import { ITokensResponse } from './../../types/responses/ITokensResponse';
 import {Injectable} from '@angular/core';
 import {
   HttpRequest,
@@ -15,10 +16,10 @@ export class RequestHeaderInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const accessToken = this.sessionService.getAccessToken();
+    const tokens: ITokensResponse = JSON.parse( this.sessionService.getTokens() as any );
 
     const addHeaderRequest = request.clone({
-      headers: new HttpHeaders({'Authorization': 'Bearer ' + accessToken})
+      headers: new HttpHeaders({'Authorization': 'Bearer ' + tokens.accessToken})
     });
 
     return next.handle(addHeaderRequest);

@@ -36,40 +36,17 @@ export class SessionService {
   deleteAllSessions(): Observable<IBaseResponse> {
     return this.httpClient.delete<IBaseResponse>(environment.baseUrl + this.sessionsRoute);
   }
-
-  getAccessToken(): string | null {
-    return localStorage.getItem(Tokens.accessToken);
+  
+  setTokens(tokens: ITokensResponse): void {
+    let anyTokens = tokens as any;
+    localStorage.setItem('Tokens', anyTokens);
   }
 
-  getRefreshToken(): string | null {
-    return localStorage.getItem(Tokens.refreshToken);
+  getTokens(): string | null {
+    return localStorage.getItem('Tokens');
   }
 
-  writeAccessToken(token: string): void {
-    localStorage.setItem(Tokens.accessToken, token);
-  }
-
-  writeRefreshToken(tokenId: string): void {
-    localStorage.setItem(Tokens.refreshToken, tokenId);
-  }
-
-  clearAccessToken(): void {
-    localStorage.removeItem(Tokens.accessToken);
-  }
-
-  clearRefreshToken(): void {
-    localStorage.removeItem(Tokens.refreshToken);
-  }
-
-  getUserId(): string | null {
-    return localStorage.getItem('MangoUserID');
-  }
-
-  writeUserId(userId: string): void {
-    localStorage.setItem(Tokens.userId, userId);
-  }
-
-  clearUserId(): void {
-    localStorage.removeItem(Tokens.userId);
+  clearTokens(): void {
+    localStorage.removeItem('Tokens');
   }
 }

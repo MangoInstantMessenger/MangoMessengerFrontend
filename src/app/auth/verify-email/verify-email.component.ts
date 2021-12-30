@@ -1,3 +1,4 @@
+import { ITokensResponse } from './../../../types/responses/ITokensResponse';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {SessionService} from "../../services/session.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -50,12 +51,10 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
   }
 
   proceedToMainComponent(): void {
-    const refreshToken = this.sessionService.getRefreshToken();
+    const tokens: ITokensResponse = JSON.parse( this.sessionService.getTokens() as any );
 
-    this.refreshSessionSub$ = this.sessionService.refreshSession(refreshToken).subscribe(result => {
-      this.sessionService.writeRefreshToken(result.refreshToken);
-      this.sessionService.writeAccessToken(result.accessToken);
-      this.sessionService.writeUserId(result.userId);
+    this.refreshSessionSub$ = this.sessionService.refreshSession(tokens.refreshToken).subscribe(result => {
+      this.sessionService.setTokens(result);
 
       this.router.navigateByUrl('main').then(r => r);
 

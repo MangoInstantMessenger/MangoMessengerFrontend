@@ -1,3 +1,4 @@
+import { ITokensResponse } from './../../../types/responses/ITokensResponse';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {SessionService} from "../../services/session.service";
@@ -28,7 +29,7 @@ import {ErrorNotificationService} from "../../services/error-notification.servic
 export class MainComponent implements OnInit, OnDestroy {
 
   private routeChatId = this.route.snapshot.paramMap.get('chatId');
-  private userId = this.sessionService.getUserId();
+  private tokens: ITokensResponse = JSON.parse( this.sessionService.getTokens() as any );
   private connectionBuilder: signalR.HubConnectionBuilder = new signalR.HubConnectionBuilder();
   private connection: signalR.HubConnection = this.connectionBuilder
     .configureLogging(signalR.LogLevel.Information)
@@ -133,7 +134,7 @@ export class MainComponent implements OnInit, OnDestroy {
       }
 
       if (!this.activeChatId) {
-        this.getCurrentUserSub$ = this.userService.getUserById(this.userId).subscribe(data => this.currentUser = data.user);
+        this.getCurrentUserSub$ = this.userService.getUserById(this.tokens.userId).subscribe(data => this.currentUser = data.user);
       }
 
     }, error => {
@@ -161,11 +162,11 @@ export class MainComponent implements OnInit, OnDestroy {
         this.connection.invoke("JoinGroup", x.chatId).then(() => this.realTimeConnections.push(x.chatId));
       });
 
-      if (this.userId != null && this.realTimeConnections.includes(this.userId)) {
+      if (this.tokens.userId != null && this.realTimeConnections.includes(this.tokens.userId)) {
         return;
       }
 
-      this.connection.invoke("JoinGroup", this.userId).then(r => r);
+      this.connection.invoke("JoinGroup", this.tokens.userId).then(r => r);
 
     }).catch(err => console.error(err.toString()));
   }
@@ -190,7 +191,7 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   onBroadcastMessage(message: IMessage): void {
-    message.self = message.userId == this.userId;
+    message.self = message.userId == this.tokens.userId;
     let chat = this.chats.filter(x => x.chatId === message.chatId)[0];
     chat.lastMessageAuthor = message.userDisplayName;
     chat.lastMessageText = message.messageText;
@@ -300,7 +301,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
       this.activeChatId = '';
 
-      this.onChatLeaveUserSub$ = this.userService.getUserById(this.userId).subscribe(data => {
+      this.onChatLeaveUserSub$ = this.userService.getUserById(this.tokens.userId).subscribe(data => {
         this.currentUser = data.user;
         this.router.navigateByUrl('main').then(r => r);
       });
