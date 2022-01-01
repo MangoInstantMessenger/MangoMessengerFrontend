@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {IGetChatMessagesResponse} from "../../types/responses/IGetChatMessagesResponse";
 import {SendMessageCommand} from "../../types/requests/SendMessageCommand";
@@ -8,6 +8,7 @@ import {EditMessageCommand} from "../../types/requests/EditMessageCommand";
 import {IBaseResponse} from "../../types/responses/IBaseResponse";
 import {IDeleteMessageResponse} from "../../types/responses/IDeleteMessageResponse";
 import {environment} from "../../environments/environment";
+import {DeleteMessageCommand} from "../../types/requests/DeleteMessageCommand";
 
 @Injectable({
   providedIn: 'root'
@@ -29,8 +30,15 @@ export class MessagesService {
   }
 
   // DELETE /api/messages/{messageId}
-  deleteMessage(messageId: string): Observable<IDeleteMessageResponse> {
-    return this.httpClient.delete<IDeleteMessageResponse>(environment.baseUrl + this.messagesRoute + messageId);
+  deleteMessage(request: DeleteMessageCommand): Observable<IDeleteMessageResponse> {
+    const options = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+      body: request,
+    };
+
+    return this.httpClient.delete<IDeleteMessageResponse>(environment.baseUrl + this.messagesRoute, options);
   }
 
   // PUT /api/messages

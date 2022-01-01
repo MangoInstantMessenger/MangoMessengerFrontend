@@ -19,6 +19,7 @@ import {DocumentsService} from "../../services/documents.service";
 import {AutoUnsubscribe} from "ngx-auto-unsubscribe";
 import {environment} from "../../../environments/environment";
 import {ErrorNotificationService} from "../../services/error-notification.service";
+import {IDeleteMessageNotification} from "../../../types/models/IDeleteMessageNotification";
 
 @AutoUnsubscribe()
 @Component({
@@ -63,6 +64,7 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   public activeChat: IChat = {
+    lastMessageId: "",
     lastMessageAuthor: "",
     lastMessageText: "",
     lastMessageTime: "",
@@ -172,20 +174,30 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   setSignalRMethods(): void {
-    this.connection.on("BroadcastMessage", (message: IMessage) => this.onBroadcastMessage(message));
+    this.connection.on("BroadcastMessageAsync", (message: IMessage) => this.onBroadcastMessage(message));
 
-    this.connection.on("UpdateUserChats", (chat: IChat) => this.chats.push(chat));
+    this.connection.on("UpdateUserChatsAsync", (chat: IChat) => this.chats.push(chat));
 
-    this.connection.on('NotifyOnMessageDelete', (messageId: string) =>
-      this.messages = this.messages.filter(x => x.messageId !== messageId)
+    this.connection.on('NotifyOnMessageDeleteAsync', (notification: IDeleteMessageNotification) => {
+        this.messages = this.messages.filter(x => x.messageId !== notification.messageId);
+        this.activeChat.lastMessageAuthor = notification.newLastMessageAuthor;
+        this.activeChat.lastMessageText = notification.newLastMessageText;
+        this.activeChat.lastMessageTime = notification.newLastMessageTime;
+        this.activeChat.lastMessageId = notification.newLastMessageId;
+      }
     );
 
-    this.connection.on('NotifyOnMessageEdit', (request: IEditMessageNotification) => {
-      let message = this.messages.filter(x => x.messageId === request.messageId)[0];
+    this.connection.on('NotifyOnMessageEditAsync', (notification: IEditMessageNotification) => {
+      let message = this.messages.filter(x => x.messageId === notification.messageId)[0];
 
       if (message) {
-        message.messageText = request.modifiedText;
-        message.updatedAt = request.updatedAt;
+        message.messageText = notification.modifiedText;
+        message.updatedAt = notification.updatedAt;
+      }
+
+      if (notification.isLastMessage) {
+        this.activeChat.lastMessageText = notification.modifiedText;
+        this.activeChat.lastMessageTime = notification.updatedAt;
       }
     });
   }
@@ -273,6 +285,7 @@ export class MainComponent implements OnInit, OnDestroy {
     this.searchSub$ = this.chatService.searchChat(this.chatSearchQuery).subscribe(response => {
       this.chats = response.chats;
       this.chatFilter = 'Search Results';
+      this.chatSearchQuery = '';
     }, error => {
       this.errorNotificationService.notifyOnError(error);
     });
@@ -317,6 +330,12 @@ export class MainComponent implements OnInit, OnDestroy {
 
 
   onEditMessageEvent(event: any) {
+    if (!this.activeChat.isMember) {
+      alert('You are not a member of the chat to edit messages.');
+      return;
+    }
+
+
     const messageId = event.messageId;
     const messageText = event.messageText;
 
@@ -324,7 +343,8 @@ export class MainComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.editMessageRequest = new EditMessageCommand(messageId, messageText);
+    const chatId = this.activeChatId;
+    this.editMessageRequest = new EditMessageCommand(messageId, chatId, messageText);
   }
 
   onJoinGroupEvent() {
@@ -346,9 +366,16 @@ export class MainComponent implements OnInit, OnDestroy {
 
   onFilterMessageDropdownClick = () => this.loadMessages(this.activeChatId);
 
-  onReplayMessageClick = (event: any) => this.replayMessageObject = {
-    messageAuthor: event.messageAuthor,
-    messageText: event.messageText
+  onReplayMessageClick = (event: any) => {
+    if (!this.activeChat.isMember) {
+      alert('You are not a member of the chat to reply messages.');
+      return;
+    }
+
+    return this.replayMessageObject = {
+      messageAuthor: event.messageAuthor,
+      messageText: event.messageText
+    };
   };
 
 

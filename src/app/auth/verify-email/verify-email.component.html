@@ -8,9 +8,9 @@
         <div *ngIf="response.success; else elseBlock" class="text-white">
           Account activated successfully.
           <br>
-          <button (click)="proceedToMainComponent()"
+          <button (click)="proceedToLoginComponent()"
                   class="btn btn-primary btn-lg btn-block text-uppercase font-weight-semibold"
-                  type="submit">Continue
+                  type="submit">Go To Login
           </button>
         </div>
         <ng-template #elseBlock>

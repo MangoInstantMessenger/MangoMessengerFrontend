@@ -1,9 +1,11 @@
 ﻿export class EditMessageCommand {
-    messageId: string
-    modifiedText: string
+  messageId: string;
+  chatId: string;
+  modifiedText: string;
 
-    constructor(messageId: string, modifiedText: string) {
-        this.messageId = messageId;
-        this.modifiedText = modifiedText;
-    }
+  constructor(messageId: string, chatId: string, modifiedText: string) {
+    this.messageId = messageId;
+    this.chatId = chatId;
+    this.modifiedText = modifiedText;
+  }
 }

@@ -22,8 +22,8 @@ export class LoginComponent implements OnDestroy {
   protected loginSub$!: Subscription;
 
   public loginCommand: LoginCommand = {
-    email: "kolosovp95@gmail.com",
-    password: "z[?6dMR#xmp=nr6q"
+    email: "",
+    password: ""
   };
 
   login(): void {

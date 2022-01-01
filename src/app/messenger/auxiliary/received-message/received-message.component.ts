@@ -3,6 +3,8 @@ import {IMessage} from "../../../../types/models/IMessage";
 import {MessagesService} from "../../../services/messages.service";
 import {Subscription} from "rxjs";
 import {AutoUnsubscribe} from "ngx-auto-unsubscribe";
+import {DeleteMessageCommand} from "../../../../types/requests/DeleteMessageCommand";
+import {ErrorNotificationService} from "../../../services/error-notification.service";
 
 @AutoUnsubscribe()
 @Component({
@@ -12,7 +14,8 @@ import {AutoUnsubscribe} from "ngx-auto-unsubscribe";
 })
 export class ReceivedMessageComponent implements OnDestroy {
 
-  constructor(private messageService: MessagesService) {
+  constructor(private messageService: MessagesService,
+              private errorNotificationService: ErrorNotificationService) {
   }
 
   protected deleteMessageSub$!: Subscription;
@@ -36,18 +39,23 @@ export class ReceivedMessageComponent implements OnDestroy {
   @Output() notifyParentOnReplayMessage = new EventEmitter<any>();
 
   isImageOrGif(): boolean {
-    let attachmentSplited = this.message.messageAttachmentUrl.split(".");
-    let attachmentFileExtension = attachmentSplited[attachmentSplited.length - 1];
+    let attachmentSplit = this.message.messageAttachmentUrl.split(".");
+    let attachmentFileExtension = attachmentSplit[attachmentSplit.length - 1];
 
-    return attachmentFileExtension == "jpg" || 
-           attachmentFileExtension == "png" || 
-           attachmentFileExtension == "gif";
+    return attachmentFileExtension == "jpg" ||
+      attachmentFileExtension == "png" ||
+      attachmentFileExtension == "gif";
   }
-  
+
   deleteMessage(): void {
+    const deleteMessageCommand = new DeleteMessageCommand(this.message.messageId, this.message.chatId);
+
+
     this.deleteMessageSub$ =
-      this.messageService.deleteMessage(this.message.messageId).subscribe(_ => {
-      }, error => alert(error.error.errorDetails));
+      this.messageService.deleteMessage(deleteMessageCommand).subscribe(_ => {
+      }, error => {
+        this.errorNotificationService.notifyOnError(error);
+      });
 
   }
 

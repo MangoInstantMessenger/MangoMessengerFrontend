@@ -65,7 +65,7 @@
       </div>
       <div *ngIf="attachmentName">
         {{attachmentName}}
-        <button (click)="deleteAttachment()" class="btn-close"></button>
+        <button (click)="clearAttachment()" class="btn-close"></button>
       </div>
       <div *ngIf="inReplayAuthor && inReplayText">
         In replay to <strong>{{inReplayAuthor}}:</strong>  {{inReplayText}}

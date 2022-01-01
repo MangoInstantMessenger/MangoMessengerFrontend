@@ -15,9 +15,9 @@ import {ErrorNotificationService} from "../../services/error-notification.servic
 export class RegisterComponent implements OnDestroy {
 
   public registerCommand: RegisterCommand = {
-    displayName: "Bo4a Account",
-    email: "kolosovp94@gmail.com",
-    password: "z[?6dMR#xmp=nr6q",
+    displayName: "",
+    email: "",
+    password: "",
     termsAccepted: false,
   };
 
@@ -51,13 +51,9 @@ export class RegisterComponent implements OnDestroy {
       return;
     }
 
-    this.registerSub$ = this.usersService.createUser(this.registerCommand).subscribe(registerResponse => {
-
-      this.sessionService.setToken(registerResponse);
-
+    this.registerSub$ = this.usersService.createUser(this.registerCommand).subscribe(_ => {
       this.router.navigateByUrl('verify-email-note').then(r => r);
     }, error => {
-      console.log(error);
       this.errorNotificationService.notifyOnError(error);
     });
   }

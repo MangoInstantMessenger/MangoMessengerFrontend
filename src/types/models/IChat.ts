@@ -13,5 +13,6 @@ export interface IChat {
   lastMessageAuthor: string,
   lastMessageText: string,
   lastMessageTime: string,
+  lastMessageId: string,
   updatedAt: string
 }

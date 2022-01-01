@@ -9,6 +9,7 @@ import {CommunityType} from "../../../../types/enums/CommunityType";
 export class ChatItemActiveComponent {
 
   @Input() chat: IChat = {
+    lastMessageId: "",
     lastMessageAuthor: "",
     lastMessageText: "",
     lastMessageTime: "",
