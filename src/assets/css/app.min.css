@@ -12645,6 +12645,16 @@ Chanelog:
   display: none;
 }
 
+.close-icon{
+  box-sizing: border-box;
+  font-size: 14px; 
+  font-stretch: ultra-expanded;
+  color: #adb5bd; 
+  display: inline-block;
+  width: 45px;
+  text-align: center;
+}
+
 @media (min-width: 1200px) {
   .main-layout .sidebar {
     flex-grow: 0;
