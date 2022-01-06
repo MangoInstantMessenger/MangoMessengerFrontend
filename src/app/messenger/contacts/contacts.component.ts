@@ -174,6 +174,11 @@ export class ContactsComponent implements OnInit, OnDestroy {
     ? 'contacts-item active'
     : 'contacts-item';
 
+  isOpenedUserCurrent() {
+    let tokens = this.sessionService.getTokens();
+    return this.currentOpenedContact.userId == tokens?.userId as any;
+  }
+
 
   ngOnDestroy(): void {
   }

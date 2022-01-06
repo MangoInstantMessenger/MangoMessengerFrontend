@@ -105,7 +105,7 @@
                   <h3 class="mb-1">{{currentOpenedContact.displayName}}</h3>
                   <h4 class="mb-1">{{currentOpenedContact.bio}}</h4>
                   <!-- <p class="text-white rounded px-2 bg-primary">+01-202-265462</p> -->
-                  <div class="d-flex mt-2">
+                  <div class="d-flex mt-2" *ngIf="!isOpenedUserCurrent()">
 
                     <button *ngIf="!currentOpenedUserIsContact" class="btn btn-outline-default" type="button"
                             (click)="onAddContactClick()">
