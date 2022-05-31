@@ -13,14 +13,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: ⚙ Use Node.js ${{ matrix.node-version }} ⚙
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - run: npm run build-qa --if-present
 
-      - name: Configure SSH
+      - name: 🛠 Configure SSH 🛠
         run: |
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/id_rsa
@@ -37,7 +37,7 @@ jobs:
           SSH_KEY: ${{ secrets.AZURE_QA_SSH_KEY }}
           SSH_HOST: ${{ secrets.AZURE_QA_SSH_HOST }}
 
-      - name: Copy Release to Remote
+      - name: 📝 Copy Release to Remote 📝
         run: |
           scp -o StrictHostKeyChecking=no -r -i ~/.ssh/id_rsa dist/mango-angular-frontend/* $SSH_USER@$SSH_HOST:/home/$SSH_USER/dist/mango-angular-frontend
           scp -o StrictHostKeyChecking=no -r -i ~/.ssh/id_rsa dist/mango-angular-frontend/index.html $SSH_USER@$SSH_HOST:/home/$SSH_USER/dist/mango-angular-frontend/404.html
@@ -45,5 +45,5 @@ jobs:
           SSH_USER: ${{ secrets.AZURE_QA_SSH_USER }}
           SSH_HOST: ${{ secrets.AZURE_QA_SSH_HOST }}
 
-      - name: Restart nginx
+      - name: 🔄 Restart nginx 🔄
         run: ssh staging "sudo systemctl restart nginx"
